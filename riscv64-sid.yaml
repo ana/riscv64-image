@@ -1,0 +1,65 @@
+# Must have installed package in host machine debian-ports-archive-keyring
+# Needs recent kernel to work
+
+architecture: riscv64
+
+actions:
+  - action: debootstrap
+    mirror: http://deb.debian.org/debian-ports/
+    suite: sid
+    components: [ main ]
+    variant: minbase
+    keyring-file: /usr/share/keyrings/debian-ports-archive-keyring.gpg
+    keyring-package: debian-ports-archive-keyring
+
+# Begin - download libffi7 from unreleased and install it
+  - action: download
+    name: libffi7
+    url: http://deb.debian.org/debian-ports/pool-riscv64/main/libf/libffi/libffi7_3.3~rc0-2~riscv64_riscv64.deb
+    filename: libffi7_3.3~rc0-2~riscv64_riscv64.deb
+
+  - action: overlay
+    origin: libffi7
+    destination: libffi7_3.3~rc0-2~riscv64_riscv64.deb
+
+  - action: run
+    chroot: true
+    command: dpkg -i libffi7_3.3~rc0-2~riscv64_riscv64.deb ; rm libffi7_3.3~rc0-2~riscv64_riscv64.deb
+# End
+
+  - action: apt
+    description: Install extra packages
+    packages:
+      - sudo
+      - openssh-server
+      - adduser
+      - systemd-sysv
+      - wget
+      - nano
+      - net-tools
+
+  - action: run
+    chroot: true
+    script: scripts/unreleased-packages.sh
+
+  - action: run
+    description: Set up user
+    chroot: true
+    script: scripts/setup-user.sh
+
+  - action: run
+    description: Add hostname
+    chroot: true
+    command: echo riscv64 > /etc/hostname
+
+  - action: overlay
+    source: overlays/networkd
+
+  - action: run
+    chroot: true
+    script: scripts/setup-networking.sh
+
+
+  - action: pack
+    file: riscv64-network.tar.gz
+    compression: gz

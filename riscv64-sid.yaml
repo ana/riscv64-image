@@ -27,6 +27,11 @@ actions:
     command: dpkg -i libffi7_3.3~rc0-2~riscv64_riscv64.deb ; rm libffi7_3.3~rc0-2~riscv64_riscv64.deb
 # End
 
+  - action: run
+    description: add unreleased repository
+    chroot: true
+    script: scripts/add-unreleased.sh
+
   - action: apt
     description: Install extra packages
     packages:
@@ -37,10 +42,11 @@ actions:
       - wget
       - nano
       - net-tools
+      - iproute2
 
   - action: run
     chroot: true
-    script: scripts/unreleased-packages.sh
+    command: apt-get clean
 
   - action: run
     description: Set up user
@@ -58,7 +64,6 @@ actions:
   - action: run
     chroot: true
     script: scripts/setup-networking.sh
-
 
   - action: pack
     file: riscv64-network.tar.gz

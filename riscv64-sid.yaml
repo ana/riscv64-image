@@ -12,21 +12,6 @@ actions:
     keyring-file: /usr/share/keyrings/debian-ports-archive-keyring.gpg
     keyring-package: debian-ports-archive-keyring
 
-# Begin - download libffi7 from unreleased and install it
-  - action: download
-    name: libffi7
-    url: http://deb.debian.org/debian-ports/pool-riscv64/main/libf/libffi/libffi7_3.3~rc0-2~riscv64_riscv64.deb
-    filename: libffi7_3.3~rc0-2~riscv64_riscv64.deb
-
-  - action: overlay
-    origin: libffi7
-    destination: libffi7_3.3~rc0-2~riscv64_riscv64.deb
-
-  - action: run
-    chroot: true
-    command: dpkg -i libffi7_3.3~rc0-2~riscv64_riscv64.deb ; rm libffi7_3.3~rc0-2~riscv64_riscv64.deb
-# End
-
   - action: run
     description: add unreleased repository
     chroot: true
